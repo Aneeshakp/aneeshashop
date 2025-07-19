@@ -21,23 +21,25 @@ export default function ProductsClient() {
   const router = useRouter();
 
   useEffect(() => {
-    fetch('http://localhost:1337/api/products?populate=*')
+    fetch('https://active-memory-bc594e2e08.strapiapp.com/api/products?populate=*')
       .then((res) => res.json())
       .then((data) => {
-          console.log('Fetched API Data:', data);
+        console.log('Fetched API Data:', data);
         if (Array.isArray(data.data)) {
           const cleanProducts = data.data.map((item: any) => {
-            const imageUrl = item.image?.[0]?.url
-              ? `http://localhost:1337${item.image[0].url}`
+            const attr = item.attributes;
+            const imageUrl = attr.image?.data?.[0]?.attributes?.url
+              ? `https://active-memory-bc594e2e08.strapiapp.com${attr.image.data[0].attributes.url}`
               : 'https://via.placeholder.com/200';
+
             return {
               id: item.id,
-              title: item.title,
-              description: item.description,
-              price: item.price,
+              title: attr.title,
+              description: attr.description,
+              price: attr.price,
               image: imageUrl,
-              color: item.color,
-              availableQty: item.availableQty,
+              color: attr.color,
+              availableQty: attr.availableQty,
             };
           });
           setProducts(cleanProducts);

@@ -1,7 +1,6 @@
 import type { AppProps } from 'next/app';
 import '../styles/globals.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
 import NextHead from 'next/head';
 import Header from '../components/header/Head';
 import Nav from '../components/nav/Navbar';
@@ -11,7 +10,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <NextHead>
-        <title>Shop e-Cart</title>
+        <title>Shop e-Cart-pageR</title>
         <meta name="description" content="by Aneesha" />
         <link
           rel="stylesheet"
