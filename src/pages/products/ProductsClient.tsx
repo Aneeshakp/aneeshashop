@@ -17,38 +17,46 @@ interface Product {
 export default function ProductsClient() {
   const [products, setProducts] = useState<Product[]>([]);
   const [error, setError] = useState('');
-  const searchParams = useSearchParams()!;
+  const searchParams = useSearchParams();
   const router = useRouter();
 
   useEffect(() => {
-    fetch('https://active-memory-bc594e2e08.strapiapp.com/api/products?populate=*')
+    fetch(
+      'https://active-memory-bc594e2e08.strapiapp.com/api/products?populate=*'
+    )
       .then((res) => res.json())
       .then((data) => {
-        console.log('Fetched API Data:', data);
-        if (Array.isArray(data.data)) {
-          const cleanProducts = data.data.map((item: any) => {
-            const attr = item.attributes;
-            const imageUrl = attr.image?.data?.[0]?.attributes?.url
-              ? `https://active-memory-bc594e2e08.strapiapp.com${attr.image.data[0].attributes.url}`
-              : 'https://via.placeholder.com/200';
+        const productsArray = Array.isArray(data.data)
+          ? data.data
+          : [data.data];
+        console.log('cleanProducts45', productsArray);
 
-            return {
-              id: item.id,
-              title: attr.title,
-              description: attr.description,
-              price: attr.price,
-              image: imageUrl,
-              color: attr.color,
-              availableQty: attr.availableQty,
-            };
-          });
-          setProducts(cleanProducts);
-        } else {
-          setError('Invalid data format from API.');
-        }
+        const cleanProducts = productsArray.map((item: any) => {
+          const attr = item.attributes || item;
+          const imageUrl =
+            attr.image?.[0]?.formats?.thumbnail?.url ||
+            attr.image?.[0]?.url ||
+            'https://via.placeholder.com/200';
+
+          return {
+            id: item.id,
+            title: attr.title,
+            description: attr.description,
+            price: attr.price,
+            image: imageUrl,
+            color: attr.colour,
+            availableQty: attr.availableQty,
+          };
+        });
+
+        setProducts(cleanProducts);
       })
-      .catch(() => setError('Failed to fetch products.'));
+      .catch((err) => {
+        setError('Failed to fetch products.');
+      });
   }, []);
+
+  if (!searchParams) return <p className="text-center mt-10">Loading filters...</p>;
 
   const qtyFilter = searchParams.get('qty')?.split(',').map(Number) || [];
   const colorFilter = searchParams.get('color')?.split(',') || [];
@@ -74,7 +82,7 @@ export default function ProductsClient() {
     const params = new URLSearchParams(searchParams.toString());
     const existing = params.get(key)?.split(',') || [];
 
-    let updated: string[] = [];
+    let updated: string[];
     if (isRadio) {
       params.set(key, value);
     } else {

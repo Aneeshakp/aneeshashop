@@ -6,17 +6,20 @@ export default async function ProductGrid() {
   });
   const json = await res.json();
 
-  const products = json.data.map((item: any) => {
-    const attr = item.attributes || {};
-    const imageUrl = attr.image?.data?.[0]?.attributes?.url
-      ? `https://active-memory-bc594e2e08.strapiapp.com${attr.image.data[0].attributes.url}`
-      : 'https://via.placeholder.com/200';
+  const productsArray = Array.isArray(json.data) ? json.data : [json.data];
+
+  const products = productsArray.map((item: any) => {
+    const attr = item.attributes || item;
+    const imageUrl =
+      attr.image?.[0]?.formats?.thumbnail?.url ||
+      attr.image?.[0]?.url ||
+      'https://via.placeholder.com/200';
 
     return {
       id: item.id,
-      title: attr.title || 'No Title',
-      description: attr.description || '',
-      price: attr.price || 0,
+      title: attr.title,
+      description: attr.description,
+      price: attr.price,
       image: imageUrl,
     };
   });
